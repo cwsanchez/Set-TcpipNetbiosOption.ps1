@@ -20,29 +20,21 @@ if ($netAdapters -eq $null) {
 $changedAdapters = @()
 
 if ($Enable) {
-	foreach ($adapter in $netAdapters) {
-		$adapter.SetTcpIpNetbios("1") | Out-Null
-		$index = $adapter.Index
-		$newAdapterSettings = Get-WmiObject -ClassName Win32_NetworkAdapterConfiguration | Where-Object -Property 'Index' -eq "$index"
-		$changedAdapters += $newAdapterSettings
-	}
+	$netbiosOption = "1"
 }
 elseif ($Disable) {
-	foreach ($adapter in $netAdapters) {
-		$adapter.SetTcpIpNetbios("2") | Out-Null
-		$index = $adapter.Index
-		$newAdapterSettings = Get-WmiObject -ClassName Win32_NetworkAdapterConfiguration | Where-Object -Property 'Index' -eq "$index"
-		$changedAdapters += $newAdapterSettings
-	}
+	$netbiosOption = "2"
 }
 elseif ($DHCPDefault) {
-	foreach ($adapter in $netAdapters) {
-		$adapter.SetTcpIpNetbios("0") | Out-Null
-		$index = $adapter.Index
-		$newAdapterSettings = Get-WmiObject -ClassName Win32_NetworkAdapterConfiguration | Where-Object -Property 'Index' -eq "$index"
-		$changedAdapters += $newAdapterSettings
-	}
+	$netbiosOption = "0"
 }	
+
+foreach ($adapter in $netAdapters) {
+	$adapter.SetTcpIpNetbios("$netbiosOption") | Out-Null
+	$index = $adapter.Index
+	$newAdapterSettings = Get-WmiObject -ClassName Win32_NetworkAdapterConfiguration | Where-Object -Property 'Index' -eq "$index"
+	$changedAdapters += $newAdapterSettings
+}
 
 if ($Silent) {
 	exit
